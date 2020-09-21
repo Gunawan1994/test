@@ -33,7 +33,7 @@ func (c *Consumer) consume() {
 	if err == nil {
 		db.Exec("CREATE DATABASE IF NOT EXISTS message_queue")
 	}
-	// migrate(db)
+	migrate(db)
 	sl, err := db.Query("SELECT * FROM message")
 	if err != nil {
 		panic(err.Error())
@@ -88,4 +88,18 @@ func main() {
 
 	<-done
 
+}
+
+func migrate(db *sql.DB) {
+	sql := `
+    CREATE TABLE IF NOT EXISTS message(
+        queue_id VARCHAR(20) NOT NULL,
+		message_txt VARCHAR(50) NOT NULL,
+		status TINYINT
+    );
+    `
+	_, err := db.Exec(sql)
+	if err != nil {
+		panic(err)
+	}
 }
